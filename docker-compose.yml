@@ -18,6 +18,7 @@ services:
       - jenkins
     ports:
       - "49000:8080"
+      - "3000:3000"
       - "50000:50000"
     environment:
       - DOCKER_HOST=tcp://docker:2376

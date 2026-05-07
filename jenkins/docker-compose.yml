@@ -1,0 +1,49 @@
+version: '3.8'
+
+networks:
+  jenkins:
+    driver: bridge
+
+volumes:
+  jenkins-data:
+  jenkins-docker-certs:
+
+services:
+  # Jenkins BlueOcean
+  jenkins-blueocean:
+    image: myjenkins-blueocean:2.426.2-1
+    container_name: jenkins-blueocean
+    restart: on-failure
+    networks:
+      - jenkins
+    ports:
+      - "8080:8080"
+      - "50000:50000"
+    environment:
+      - DOCKER_HOST=tcp://docker:2376
+      - DOCKER_CERT_PATH=/certs/client
+      - DOCKER_TLS_VERIFY=1
+      - JAVA_OPTS=-Dhudson.plugins.git.GitSCM.ALLOW_LOCAL_CHECKOUT=true
+    volumes:
+      - jenkins-data:/var/jenkins_home
+      - jenkins-docker-certs:/certs/client:ro
+      - "$HOME:/home"
+    depends_on:
+      - docker-dind
+
+  # Docker-in-Docker (Diperlukan berdasarkan environment variable kamu)
+  docker-dind:
+    image: docker:dind
+    container_name: jenkins-docker
+    privileged: true
+    networks:
+      jenkins:
+        aliases:
+          - docker
+    environment:
+      - DOCKER_TLS_CERTDIR=/certs
+    volumes:
+      - jenkins-docker-certs:/certs/client
+      - jenkins-data:/var/jenkins_home
+    ports:
+      - "2376:2376"

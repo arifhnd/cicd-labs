@@ -1,28 +1,31 @@
-pipeline {
-    agent {
-        docker {
-            image 'node:16-buster-slim' 
-            args '-p 3000:3000' 
-        }
+node {
+    def nodeImage = docker.image('node:16-buster-slim')
+
+    stage('Checkout') {
+        checkout scm
     }
-    stages {
-        stage('Build') { 
-            steps {
-                sh 'npm install'
-            }
+
+    nodeImage.inside('-p 3000:3000') {
+        
+        stage('Build') {
+            sh 'npm install'
         }
+
         stage('Test') {
-            steps {
-                sh './jenkins/scripts/test.sh'
-                input message: 'Apakah semua test sudah berjalan dengan baik? (Klik "Proceed" untuk melanjutkan ke tahap deploy)'
-            }
+            sh './jenkins/scripts/test.sh'
         }
-        stage('Deploy') { 
-            steps {
-                sh './jenkins/scripts/deliver.sh' 
-                sleep 60
-                sh './jenkins/scripts/kill.sh'
-            }
+
+        stage('Manual Approval') {
+            input message: 'Apakah semua test sudah berjalan dengan baik? (Klik "Proceed" untuk melanjutkan ke tahap deploy)'
+        }
+
+        stage('Deploy') {
+            sh './jenkins/scripts/deliver.sh'
+            
+            // Sleep 60 detik (1 menit) agar bisa localhost:3000
+            sleep time: 1, unit: 'MINUTES'
+            
+            sh './jenkins/scripts/kill.sh'
         }
     }
 }

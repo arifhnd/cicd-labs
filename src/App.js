@@ -5,14 +5,12 @@ import './App.css';
 class App extends Component {
   render() {
     return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">Welcome to React</h1>
-        </header>
-        <p className="App-intro">
-          To get started, edit <code>src/App.js</code> and save to reload.
-        </p>
+      <div className="App" style={{ textAlign: 'center', padding: '20px' }}>
+      <header className="App-header" style={{ backgroundColor: '#282c34', color: 'white', minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+        <img src={logo} className="App-logo" alt="logo" style={{ height: '40vmin', pointerEvents: 'none' }} />
+        <h1 style={{ fontSize: '2.5rem', margin: '20px 0' }}>Test CI/CD Pipeline</h1>
+        <p style={{ fontSize: '1.2rem', margin: '10px 0' }}>This app is for testing CI/CD pipeline for bootcamp dicoding.</p>
+      </header>
       </div>
     );
   }
